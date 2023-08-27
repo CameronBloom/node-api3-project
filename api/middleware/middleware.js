@@ -1,3 +1,5 @@
+const User = require("../users/users-model")
+
 function logger(req, res, next) {
   // DO YOUR MAGIC
   const reqMethod = req.method
@@ -7,8 +9,27 @@ function logger(req, res, next) {
   next()
 }
 
-function validateUserId(req, res, next) {
+// interacting with DB? use async
+async function validateUserId(req, res, next) {
   // DO YOUR MAGIC
+  // fetch a user with a given ID
+  // => is it there? proceed
+  // => not there? throw an error
+  try {
+    const userLookup = await User.getById(req.params.id)
+    if (!userLookup) {
+      res.status(404).json({
+        message: "user not found"
+      })
+    } else {
+      req.user = userLookup
+      next()
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: "error encountered when validating user ID"
+    })
+  }
 }
 
 function validateUser(req, res, next) {
@@ -22,4 +43,5 @@ function validatePost(req, res, next) {
 // do not forget to expose these functions to other modules
 module.exports = {
   logger,
+  validateUserId,
 }
