@@ -3,6 +3,8 @@ const { validateUserId, validateUser, validatePost } = require("../middleware/mi
 
 // You will need `users-model.js` and `posts-model.js` both
 // The middleware functions also need to be required
+const User = require("../users/users-model")
+const Post = require("../post/posts-model")
 
 const router = express.Router();
 
@@ -41,6 +43,15 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
 });
+
+// error handling
+router.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message,
+    stack: err.stack,
+    alert: "error handler has identified an issue"
+  })
+})
 
 // do not forget to export the router
 module.exports router
